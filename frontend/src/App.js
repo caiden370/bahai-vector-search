@@ -5,7 +5,7 @@ import Text from './Text';
 import './App.css';
 
 
-const REACT_APP_BACKEND_URL='http://127.0.0.1:5000';
+const REACT_APP_BACKEND_URL='https://bahai-vector-search.onrender.com';
 function App() {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
