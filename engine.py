@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
-from word2vec import BahaiWord2Vec
+# from word2vec import BahaiWord2Vec
 import torch
 import json
 import numpy as np
