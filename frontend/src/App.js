@@ -249,7 +249,14 @@ function App() {
         contentLabel="Welcome Popup"
       >
         <h2>Welcome!</h2>
-        <p>Seek Baha'i is a powerful search tool designed to help you explore the depth of Baha'i writings using semantic search. Unlike traditional keyword searches, Seek Baha'i leverages sentence embeddings and a vector database to find passages based on meaning, allowing you to search for ideas, concepts, and semantically similar phrases across the texts. This project originated at Princeton University as an effort to make Baha'i literature more accessible and discoverable through modern machine learning techniques. Whether you're studying, researching, or simply exploring, Seek Baha'i aims to connect you with the wisdom of the Baha'i Faith in a more intuitive way.</p>
+        <p>Seek Baha'i is a powerful search tool designed to help you explore the depths 
+          of the Baha'i writings using semantic search. Unlike traditional keyword searches, 
+          Seek Baha'i leverages sentence embeddings and a vector database to find passages 
+          based on meaning, allowing you to search for ideas, concepts, and semantically similar 
+          phrases across the texts. This project originated at Princeton University as an effort 
+          to make Baha'i literature more accessible and discoverable through modern machine learning
+           techniques. Whether you're studying, researching, or simply exploring, Seek Baha'i aims 
+           to connect you with the wisdom of the Baha'i Faith in a more intuitive way.</p>
         <button onClick={() => setIsOpen(false)}>Close</button>
       </Modal>
     );
