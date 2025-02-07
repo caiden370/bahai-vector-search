@@ -6,6 +6,8 @@ import './App.css';
 import Split from "react-split";
 import { LibraryBig, BookOpenText, Search } from 'lucide-react';
 import { useMediaQuery } from "react-responsive";
+import Modal from "react-modal";
+
 
 const REACT_APP_BACKEND_URL='https://bahai-vector-search.onrender.com';
 function App() {
@@ -21,6 +23,7 @@ function App() {
   const mobileDivRef = useRef(null);
   const [backToResult, setBackToResult] = useState(false);
   const isMobile = useMediaQuery({ maxWidth: 768 });
+  const [isOpen, setIsOpen] = useState(false);
 
   
 
@@ -229,10 +232,36 @@ function App() {
 
 
   // ----------------------------------------------------------------------------------------------
+  // INFO POP UP 
+
+    useEffect(() => {
+      setIsOpen(true); // Open the popup when the component mounts
+    }, []);
+
+    const InfoPopUp = () => {
+
+    return (
+      <Modal
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+        className="popup-modal"
+        overlayClassName="popup-overlay"
+        contentLabel="Welcome Popup"
+      >
+        <h2>Welcome!</h2>
+        <p>Seek Baha'i is a powerful search tool designed to help you explore the depth of Baha'i writings using semantic search. Unlike traditional keyword searches, Seek Baha'i leverages sentence embeddings and a vector database to find passages based on meaning, allowing you to search for ideas, concepts, and semantically similar phrases across the texts. This project originated at Princeton University as an effort to make Baha'i literature more accessible and discoverable through modern machine learning techniques. Whether you're studying, researching, or simply exploring, Seek Baha'i aims to connect you with the wisdom of the Baha'i Faith in a more intuitive way.</p>
+        <button onClick={() => setIsOpen(false)}>Close</button>
+      </Modal>
+    );
+    }
+
+
+  
 
   return (
     <div class='outer-container'>
 	  {/* SEARCH BAR */}
+    {InfoPopUp()}
     
       <div class='search-bar-container'>
       <div class='search-filler'></div>
