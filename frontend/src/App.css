@@ -66,6 +66,17 @@
   /* padding: 10px; */
   overflow-y: scroll;
   /* border-radius: 10px; */
+  height: 100%;
+}
+
+.search-results-container-mobile {
+  /* flex: 1; Optional: Divs take equal width */
+  /* margin: 0 10px; Optional: Adds spacing between the divs */
+  border: 1px solid gray; /* Optional: for visual clarity */
+  /* padding: 10px; */
+  /* overflow-y: scroll; */
+  /* border-radius: 10px; */
+  height: 100%;
 }
 
 .result {
@@ -92,6 +103,9 @@
   align-items: center;
 }
 
+.selected-result {
+  background-color: #c4c4c4;
+}
 
 /*  FULL TEXT */
 .full-text-container {
@@ -102,8 +116,20 @@
   overflow-y: scroll;
   /* padding: 10px; */
   /* border-radius: 10px; */
-  border-left: 0px;
-  /* height: 85%; */
+  /* border-left: 0px; */
+  height: 100%;
+}
+
+.full-text-container-mobile {
+  /* flex:1; */
+  /* margin: 0 10px; Optional: Adds spacing between the divs */
+  border: 1px solid gray; /* Optional: for visual clarity */
+  /* padding-top: 10px; */
+  /* overflow-y: scroll; */
+  /* padding: 10px; */
+  /* border-radius: 10px; */
+  /* border-left: 0px; */
+  height: 100%;
 }
 
 .highlight-text {
@@ -167,6 +193,10 @@
   padding: 5px;
 }
 
+.button-icon:hover {
+  color: #c4c4c4;
+}
+
 .split-container {
   display: flex;
   /* height: 100vh; */
@@ -185,11 +215,53 @@
 }
 
 .gutter {
-  background: #666;
-  cursor: ew-resize;
-  width: 8px;
+  background: #dddcdc; /* Dark background */
+  display: flex;
+  align-items: center;  /* Centers vertically */
+  justify-content: center; /* Centers horizontally */
+  cursor: ew-resize; /* Resize cursor for horizontal panels */
+  width: 10px; /* Adjust based on your gutterSize */
+  border-bottom: 1px solid gray;
+  border-top: 1px solid gray;
 }
 
+.gutter:hover {
+  background: #c4c4c4; /* Slightly lighter on hover */
+}
+
+.grip-icon {
+  font-size: 20px;
+  color: white;
+  user-select: none;
+}
+
+
+.mobile-container {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: space-between; Space between the two divs */
+  border: 1px solid gray; /*Optional: for visual clarity*/
+  padding-top: 10px;
+  /* margin: 10px; */
+  background-color: white;
+  height:calc(88vh);
+  /* min-height: 500px; */
+  overflow: hidden;
+  width: 100%;
+}
+
+.mobile-toggle-bar {
+  position: sticky;
+  bottom: 0;
+  height: 10%;
+  width: 100%;
+  background-color: #58b1b8;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  /* padding: 10px; */
+}
 
 /* 
 

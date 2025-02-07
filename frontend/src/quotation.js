@@ -4,7 +4,7 @@ import './App.css';
 import { BookText } from 'lucide-react';
 
 
-function Quotation({ Similarity, Text, Sentence, Book, Section, fullTextCallback, url, handleScroll}) {
+function Quotation({ Similarity, Text, Sentence, Book, Section, index, fullTextCallback, url, handleScroll}) {
   const [showMore, setShowMore] = useState(false); // State to track button toggle
   const [showSection, setShowSection] = useState(false); // State to track button toggle
   const [nearbyTextResponse, setNearbyTextResponse] = useState(null);
@@ -40,7 +40,7 @@ function Quotation({ Similarity, Text, Sentence, Book, Section, fullTextCallback
         });
         const data = res.data;
         setNearbyTextResponse(data);
-        fullTextCallback(data);
+        fullTextCallback(data, index);
 
       }
       else {
