@@ -4,6 +4,8 @@
   background-color: white;
   color: black;
   height: 100vh;
+  width: 100%;
+  position: fixed;
 }
 
 
@@ -63,10 +65,9 @@
   /* flex: 1; Optional: Divs take equal width */
   /* margin: 0 10px; Optional: Adds spacing between the divs */
   border: 1px solid gray; /* Optional: for visual clarity */
-  /* padding: 10px; */
   overflow-y: scroll;
-  /* border-radius: 10px; */
   height: 100%;
+  overflow-x: hidden;
 }
 
 .search-results-container-mobile {
@@ -118,6 +119,7 @@
   /* border-radius: 10px; */
   /* border-left: 0px; */
   height: 100%;
+  overflow-x: hidden;
 }
 
 .full-text-container-mobile {
@@ -191,6 +193,7 @@
 
 .icon {
   padding: 5px;
+  flex-shrink: 0;
 }
 
 .button-icon:hover {
@@ -251,7 +254,7 @@
 }
 
 .mobile-toggle-bar {
-  position: sticky;
+  position: fixed;
   bottom: 0;
   height: 10%;
   width: 100%;
@@ -259,7 +262,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-evenly;
   /* padding: 10px; */
 }
 

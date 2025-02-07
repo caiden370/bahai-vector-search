@@ -219,9 +219,9 @@ function App() {
     <div class='mobile-container' ref={mobileDivRef}>
       {toggleFullText ? showFullTextMobile() : showResultsMobile()}
       <div class='mobile-toggle-bar'>
-      <LibraryBig class="button-icon icon" size={25} color='white' onClick={mobileResultsButton}></LibraryBig>
-      <BookOpenText class="button-icon icon" size={25} color='white' onClick={mobileTextButton}></BookOpenText>
-      <Search class="button-icon icon" size={25} color='white' onClick={handleSubmit}></Search>
+      <LibraryBig class="button-icon icon" size={32} color='white' onClick={mobileResultsButton}></LibraryBig>
+      <BookOpenText class="button-icon icon" size={32} color='white' onClick={mobileTextButton}></BookOpenText>
+      <Search class="button-icon icon" size={32} color='white' onClick={handleSubmit}></Search>
       </div>
     </div>
     );
