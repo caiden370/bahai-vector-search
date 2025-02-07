@@ -10,7 +10,7 @@ const Text = ({ data, section_idx, highlightRef, handleBook }) => {
     }
     return (
 
-        <div>
+        <div class='full-text-main'>
             {Object.keys(data.Text).map((key) => {
                 const text = data.Text[key];
                 const section = data.Section[key];

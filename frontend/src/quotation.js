@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
+import { BookText } from 'lucide-react';
 
 
 function Quotation({ Similarity, Text, Sentence, Book, Section, fullTextCallback, url, handleScroll}) {
@@ -59,13 +60,12 @@ function Quotation({ Similarity, Text, Sentence, Book, Section, fullTextCallback
 
   return (
     <div onClick={handleShowSection} class='result'>
-      <p>
-        {Sentence}
-      </p>
-      <p>
-        <strong>Book:</strong> {Book}<br />
-        {/* <strong>Section:</strong> {Section} */}
-      </p>
+      <div class='result-sentence-container'>
+          ...{Sentence} ...
+      </div>
+      <div class='result-book-container'>
+          <BookText class='icon'> </BookText> {Book}
+      </div>
     </div>
   );
 }

@@ -1,43 +1,3 @@
-/* BASIC CSS STYLE - REMOVE LATER */
-
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 
 /* OUTER CONTAINER */
 .outer-container {
@@ -46,21 +6,32 @@
   height: 100vh;
 }
 
+
+.search-filler {
+  width: 10%;
+}
+
 .search-bar-container {
-  background-color: #4444ff;
-  padding:10px;
+  background-color: #58b1b8;
+  padding:15px;
+  display: flex;
+  flex-direction: row;
+  height: vh;
+  overflow: hidden;
 }
 
 .search-form {
-  width: 100%;
+  width: 80%;
 }
 
 .search-input {
-  padding: 8px;
+  padding: 10px;
   width: calc(100% - 20px);
   background-color: white;
   border-radius: 30px;
   border-width: 0px;
+  font-size: 18px;
+  overflow: hidden;
 }
 
 .search-button {
@@ -77,38 +48,62 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between; /* Space between the two divs */
-  border: 1px solid #ccc; /* Optional: for visual clarity */
+  border: 1px solid gray; /* Optional: for visual clarity */
+  
   padding: 10px;
   /* margin: 10px; */
   background-color: white;
-  height:calc(100vh - 70px);
+  height:calc(88vh);
+  overflow: hidden;
 }
 
 
 /* SEARCH RESULTS */
 .search-results-container {
-  flex: 1; /* Optional: Divs take equal width */
-  margin: 0 10px; /* Optional: Adds spacing between the divs */
-  border: 1px solid #888; /* Optional: for visual clarity */
-  padding: 10px;
+  /* flex: 1; Optional: Divs take equal width */
+  /* margin: 0 10px; Optional: Adds spacing between the divs */
+  border: 1px solid gray; /* Optional: for visual clarity */
+  /* padding: 10px; */
   overflow-y: scroll;
+  /* border-radius: 10px; */
 }
 
+.result {
+  border-bottom: 1px solid grey;
+  padding: 10px;
+}
 
 .result:hover{
-  background-color: #cccccc;
+  background-color: #dcd9d9;
 
+}
+
+.result-sentence-container {
+  border-bottom: 4px solid grey;
+  padding: 3px;
+
+}
+
+.result-book-container {
+  display: flex;
+  flex-direction: row;
+  margin-left: 10px;
+  margin-right: 10px;
+  align-items: center;
 }
 
 
 /*  FULL TEXT */
 .full-text-container {
-  flex:1;
-  margin: 0 10px; /* Optional: Adds spacing between the divs */
-  border: 1px solid #888; /* Optional: for visual clarity */
-  padding-top: 10px;
+  /* flex:1; */
+  /* margin: 0 10px; Optional: Adds spacing between the divs */
+  border: 1px solid gray; /* Optional: for visual clarity */
+  /* padding-top: 10px; */
   overflow-y: scroll;
-  padding: 10px;
+  /* padding: 10px; */
+  /* border-radius: 10px; */
+  border-left: 0px;
+  /* height: 85%; */
 }
 
 .highlight-text {
@@ -122,18 +117,81 @@
 } */
 
 .full-text-inner {
-  flex:1;
-  border: 1px solid #888; /* Optional: for visual clarity */
+  /* flex:1; */
+  border: 1px solid gray; /* Optional: for visual clarity */
+  padding: 10px;
+}
+
+.full-text-main {
+  padding: 10px;
 }
 
 .book-title {
+  /* position: sticky; */
+  /* top: 0; */
   padding: 10px;
-  margin: 3px;
-  text-align: center;
   width: 100%;
-  background-color: #4444ff;
+  color: black;
+  /* background-color: #58b1b8; */
+  border-bottom: 1px solid gray;
+  height: 50%;
+  overflow-x: hidden;
 }
 
+.panel-menu {
+  position: sticky;
+  top: 0;
+  /* padding: 10px; */
+  width: 100%;
+  min-height: 5%;
+  border-bottom: 1px solid gray;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  color: grey;
+}
+
+.panel-header {
+  border-bottom: 1px solid gray;
+  min-height: 50%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.panel-header-text {
+  padding: 10px;
+}
+
+.icon {
+  padding: 5px;
+}
+
+.split-container {
+  display: flex;
+  /* height: 100vh; */
+  width: 100%
+}
+
+.panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f9fa;
+  border: 2px solid #333;
+  font-size: 18px;
+  text-align: center;
+  width: 100%;
+}
+
+.gutter {
+  background: #666;
+  cursor: ew-resize;
+  width: 8px;
+}
+
+
+/* 
 
 .search-results-container::-webkit-scrollbar,
 .full-text-inner::-webkit-scrollbar {
@@ -149,4 +207,4 @@
 .search-results-container::-webkit-scrollbar-thumb:hover,
 .full-text-inner::-webkit-scrollbar-thumb:hover {
     background-color: #555;
-}
+} */

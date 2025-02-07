@@ -3,7 +3,8 @@ import axios from 'axios';
 import Quotation from './quotation';
 import Text from './Text';
 import './App.css';
-
+import Split from "react-split";
+import { LibraryBig, BookOpenText } from 'lucide-react';
 
 const REACT_APP_BACKEND_URL='https://bahai-vector-search.onrender.com';
 function App() {
@@ -13,6 +14,7 @@ function App() {
   const [fullText, setFullText] = useState(null);
   const highlightRef = useRef(null);
   const [highlight, setHighlight] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (highlight && highlightRef.current) {
@@ -23,6 +25,7 @@ function App() {
       highlightRef.current.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
+        inline: 'nearest'
       });
 	//   setHighlight(false);
     }
@@ -34,8 +37,6 @@ function App() {
 	}
   }, [fullText]);
   
-  
-
 
 
   const handleSubmit = async (e) => {
@@ -51,6 +52,7 @@ function App() {
     } catch (error) {
       console.error("Error fetching data from the backend:", error);
     }
+   
   };
 
 
@@ -64,7 +66,6 @@ function App() {
 	  <div>
 		{response.map((r, i) => (
 		  <React.Fragment key={i}>
-			<hr />
 			<div>
 			  <Quotation {...r} fullTextCallback={fullTextCallback} url={REACT_APP_BACKEND_URL} handleScroll={handleScroll}></Quotation>
 			</div>
@@ -86,15 +87,61 @@ function App() {
 
   const handleDisplayBook = () => {
     return (
-      <span class='book-title'>Book: {book}</span>
+      <div class='book-title'>
+        <strong>
+        {book}
+        </strong>
+        
+      </div>
     );
 
   }
 
+
+
+  const SplitPanel = () => {
+    return (
+      <Split
+        className="split-container"
+        sizes={[50, 50]} // Initial sizes (percent)
+        minSize={100} // Minimum size of each panel
+        gutterSize={8} // Width of draggable gutter
+      >
+        {/* Panel 1 */}
+        <div class="search-results-container">
+          <div class='panel-menu'>
+              <div class='panel-header'> 
+              <LibraryBig class="icon" size={25}></LibraryBig>
+                  <div class='panel-header-text'><strong>Results</strong></div>
+              </div>
+          </div>
+        {response && <p style={{ marginTop: '20px' }}>{handleResponse(response)}</p>}
+      </div>
+  
+        {/* Panel 2 */}
+          <div id='fulltext' class="full-text-container">
+              <div class='panel-menu'>
+                  <div class='panel-header'> 
+                      <BookOpenText class="icon" size={25}></BookOpenText>
+                      <div class='panel-header-text'><strong>Text</strong></div>
+                  </div>
+                  {book && handleDisplayBook()}
+              </div>
+              {fullText && handleFullText()}
+          </div>
+      </Split>
+    );
+  };
+
+
+
+
   return (
     <div class='outer-container'>
 	  {/* SEARCH BAR */}
+    
       <div class='search-bar-container'>
+      <div class='search-filler'></div>
       <form onSubmit={handleSubmit} class='search-form'>
         <input
           class="search-input"
@@ -106,17 +153,30 @@ function App() {
         {/* <button type="submit" class='search-button'>Submit</button> */}
       </form>
       </div>
+      <div class='search-filler'></div>
 	  
 	  {/* Search Results */}
 	<div class="container">
-		<div class="search-results-container">
+		{/* <div class="search-results-container">
+      <div class='panel-menu'>
+      <div class='panel-header'> 
+      <div class='panel-header-text'><strong>Results</strong></div>
+      </div>
+      </div>
 			{response && <p style={{ marginTop: '20px' }}>{handleResponse(response)}</p>}
 		</div>
+    
 		<div id='fulltext' class="full-text-container">
-      {/* {book && handleDisplayBook()} */}
+      <div class='panel-menu'>
+        <div class='panel-header'> 
+        <div class='panel-header-text'><strong>Text</strong></div>
+        
+        </div>
+        {book && handleDisplayBook()}
+      </div>
       {fullText && handleFullText()}
-			
-		</div>
+		</div> */}
+    {SplitPanel()}
 	</div>	
 
 	  
