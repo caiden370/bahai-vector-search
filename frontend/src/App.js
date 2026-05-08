@@ -9,7 +9,7 @@ import { useMediaQuery } from "react-responsive";
 import Modal from "react-modal";
 
 
-const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
+const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://bahai-vector-search.onrender.com';
 function App() {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
