@@ -233,9 +233,14 @@ function App() {
     <div className='mobile-container' ref={mobileDivRef}>
       {toggleFullText ? showFullTextMobile() : showResultsMobile()}
       <div className='mobile-toggle-bar'>
-      <LibraryBig className="button-icon" size={28} onClick={mobileResultsButton} />
-      <BookOpenText className="button-icon" size={28} onClick={mobileTextButton} />
-      <Search className="button-icon" size={28} onClick={handleSubmit} />
+      <div className={`mobile-tab ${!toggleFullText ? 'mobile-tab-active' : ''}`} onClick={mobileResultsButton}>
+        <LibraryBig size={26} />
+        <span>Results</span>
+      </div>
+      <div className={`mobile-tab ${toggleFullText ? 'mobile-tab-active' : ''}`} onClick={mobileTextButton}>
+        <BookOpenText size={26} />
+        <span>Text</span>
+      </div>
       </div>
     </div>
     );
@@ -296,6 +301,9 @@ function App() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
+            <button type='submit' className='search-submit-button'>
+              <Search size={18} />
+            </button>
           </div>
         </form>
         <button className='info-button' onClick={() => setIsOpen(true)} type='button'>
