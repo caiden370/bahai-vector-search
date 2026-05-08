@@ -1,29 +1,17 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import sys
 import os
 from flask import send_from_directory
-from sentence_transformers import SentenceTransformer
-# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from onnx_encoder import OnnxEncoder
 from engine import raw_query, load_centroids, get_nearby_text, get_book
-# from word2vec import BahaiWord2Vec
-# from simcse import SimCSE
 import json
 
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='')
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# cluster_dir = 'vectordb_finetunedbert_sentence'
-# cluster_dir = 'vectordb_SBERT_sentence_200c'
-# cluster_dir = 'vectordb_simcse_sentence_200c'
 cluster_dir = 'vectordb_SBERT_sentence_100c'
 centroids = load_centroids(f"{cluster_dir}/centroids_embeddings.npy")
-model = SentenceTransformer('all-MiniLM-L6-v2')         
-# model = SimCSE("princeton-nlp/sup-simcse-bert-base-uncased")
-# model = SentenceTransformer("fine_tuned_model/")
-# model = SentenceTransformer("finetune_bert_full_dataset_4/")
-# model = BahaiWord2Vec()
-# model.load(model_file='word2vec_models/v3.model') 
+model = OnnxEncoder("onnx_model")
 
 @app.route('/query', methods=['GET'])
 def handle_query():
@@ -33,7 +21,7 @@ def handle_query():
         query=q, 
         centroids=centroids,
         cluster_dir=cluster_dir,
-        n=50,
+        n=15,
         k=20,
         )
     return jsonify({"response": answers})
@@ -71,4 +59,5 @@ def serve_static(path):
 
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

@@ -5,32 +5,33 @@ import argparse
 import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
-from sentence_transformers import SentenceTransformer
 # from word2vec import BahaiWord2Vec
-import torch
 import json
-import numpy as np
 import heapq
-from sklearn.metrics.pairwise import cosine_similarity
+from functools import lru_cache
 
 def load_centroids(centroids_path):
     return np.load(centroids_path)
+
+@lru_cache(maxsize=100)
+def _load_single_cluster(cluster_dir, cluster_id):
+    """Load a single cluster's embeddings and data, cached in memory."""
+    embeddings_path = os.path.join(cluster_dir, f'cluster_{cluster_id}_embeddings.npy')
+    data_path = os.path.join(cluster_dir, f'cluster_{cluster_id}.csv')
+    if os.path.exists(embeddings_path) and os.path.exists(data_path):
+        return np.load(embeddings_path), pd.read_csv(data_path)
+    print(f"Cluster files for cluster {cluster_id} not found.")
+    return None, None
+
 
 def load_cluster_embeddings(cluster_dir, cluster_ids):
     embeddings_list = []
     data_frames = []
     for cluster_id in cluster_ids:
-        embeddings_path = os.path.join(cluster_dir, f'cluster_{cluster_id}_embeddings.npy')
-        data_path = os.path.join(cluster_dir, f'cluster_{cluster_id}.csv')
-
-        if os.path.exists(embeddings_path) and os.path.exists(data_path):
-            cluster_embeddings = np.load(embeddings_path)
-            cluster_data = pd.read_csv(data_path)
-
-            embeddings_list.append(cluster_embeddings)
-            data_frames.append(cluster_data)
-        else:
-            print(f"Cluster files for cluster {cluster_id} not found.")
+        emb, data = _load_single_cluster(cluster_dir, int(cluster_id))
+        if emb is not None:
+            embeddings_list.append(emb)
+            data_frames.append(data)
 
     if embeddings_list:
         embeddings = np.vstack(embeddings_list)
@@ -39,14 +40,7 @@ def load_cluster_embeddings(cluster_dir, cluster_ids):
         embeddings = np.array([])
         data = pd.DataFrame()
 
-    # filtered_df = data[~data['Section'].str.contains('header', case=False, na=False)]
-    # filtered_df = filtered_df[~data['Section'].str.contains('title', case=False, na=False)]
-    # filtered_embeddings = embeddings[filtered_df.index]
-    filtered_df = data
-    filtered_embeddings = embeddings
-
-    # return embeddings, data
-    return filtered_embeddings, filtered_df
+    return embeddings, data
 
 
 def find_nearest_neighbors_optimized(query_embedding, embeddings, k):
