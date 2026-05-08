@@ -9,7 +9,7 @@ import { useMediaQuery } from "react-responsive";
 import Modal from "react-modal";
 
 
-const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 function App() {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
