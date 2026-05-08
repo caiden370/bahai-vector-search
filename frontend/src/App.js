@@ -1,15 +1,15 @@
-import React, { useState, useRef, useEffect,  } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import Quotation from './quotation';
 import Text from './Text';
 import './App.css';
 import Split from "react-split";
-import { LibraryBig, BookOpenText, Search } from 'lucide-react';
+import { LibraryBig, BookOpenText, Search, Info, BookOpen, Sparkles } from 'lucide-react';
 import { useMediaQuery } from "react-responsive";
 import Modal from "react-modal";
 
 
-const REACT_APP_BACKEND_URL='https://bahai-vector-search.onrender.com';
+const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 function App() {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
@@ -53,7 +53,9 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!query.trim()) return;
     setSelectedIndex(-1);
+    setLoading(true);
     try {
       const res = await axios.get(`${REACT_APP_BACKEND_URL}/query`, { 
         params: {query: query}, 
@@ -64,8 +66,9 @@ function App() {
       setResponse(res.data.response);
     } catch (error) {
       console.error("Error fetching data from the backend:", error);
+    } finally {
+      setLoading(false);
     }
-   
   };
 
 
@@ -79,13 +82,12 @@ function App() {
 
 
   const handleResponse = (response) => {
-    // setBackToResult(!backToResult);
 	return (
 	  <div>
 		{response.map((r, i) => (
 		  <React.Fragment key={i}>
 			<div>
-			  <Quotation class={i === selectedIndex ? 'selected-result' : ''} {...r} index={i} fullTextCallback={fullTextCallback} url={REACT_APP_BACKEND_URL} handleScroll={handleScroll}></Quotation>
+			  <Quotation className={i === selectedIndex ? 'selected-result' : ''} {...r} index={i} fullTextCallback={fullTextCallback} url={REACT_APP_BACKEND_URL} handleScroll={handleScroll} />
 			</div>
 		  </React.Fragment>
 		))}
@@ -106,55 +108,66 @@ function App() {
 
   const handleDisplayBook = () => {
     return (
-      <div class='book-title'>
-        <strong>
+      <div className='book-title'>
         {book}
-        </strong>
-        
       </div>
     );
-
   }
 
   // ----------------------------------------------------------------------------------------------
   // DESKTOP VIEW
 
+  const EmptyResults = () => (
+    <div className="empty-state">
+      <Sparkles className="empty-state-icon" size={48} />
+      <h3>Search the Bahá'í Writings</h3>
+      <p>Enter a concept, theme, or phrase above to find relevant passages</p>
+    </div>
+  );
+
+  const EmptyText = () => (
+    <div className="empty-state">
+      <BookOpen className="empty-state-icon" size={48} />
+      <h3>Reading Pane</h3>
+      <p>Click a result to view the surrounding text</p>
+    </div>
+  );
+
   const SplitPanel = () => {
     return (
-      <div class='container'>
+      <div className='container'>
       <Split
       className="split-container"
-      sizes={[50, 50]} // Initial sizes (percent)
-      minSize={100} // Minimum size of each panel
-      gutterSize={10} // Width of draggable gutter
+      sizes={[50, 50]}
+      minSize={100}
+      gutterSize={6}
       gutter={(index, direction) => {
         const gutter = document.createElement("div");
         gutter.className = `gutter gutter-${direction}`;
-        gutter.innerHTML = `<span class="grip-vertical">☰</span>`; // Grip icon
         return gutter;
       }}
     >
         {/* Panel 1 */}
-        <div class="search-results-container">
-          <div class='panel-menu'>
-              <div class='panel-header'> 
-              <LibraryBig class="icon" size={25}></LibraryBig>
-                  <div class='panel-header-text'><strong>Results</strong></div>
+        <div className="search-results-container">
+          <div className='panel-menu'>
+              <div className='panel-header'> 
+              <LibraryBig className="icon" size={18} />
+                  <div className='panel-header-text'>Results</div>
               </div>
           </div>
-        {response && <p style={{ marginTop: '0px' }}>{handleResponse(response)}</p>}
+        {loading ? <div className="loading-container">Searching...</div> : response ? handleResponse(response) : <EmptyResults />}
       </div>
   
         {/* Panel 2 */}
-          <div id='fulltext' class="full-text-container">
-              <div class='panel-menu'>
-                  <div class='panel-header'> 
-                      <BookOpenText class="icon" size={25}></BookOpenText>
-                      <div class='panel-header-text'><strong>Text</strong></div>
+          <div id='fulltext' className="full-text-container">
+              <div className='panel-menu'>
+                  <div className='panel-header'> 
+                      <BookOpenText className="icon" size={18} />
+                      <div className='panel-header-text'>Text</div>
                   </div>
                   {book && handleDisplayBook()}
               </div>
-              {fullText && handleFullText()}
+              {fullText ? handleFullText() : <EmptyText />}
           </div>
       </Split>
       </div>
@@ -165,33 +178,31 @@ function App() {
 
   const showFullTextMobile = () => {
     return (
-      <div id='fulltext' class="full-text-container" ref={mobileDivRef}>
-      <div class='panel-menu'>
-          <div class='panel-header'> 
-              <BookOpenText class="icon" size={25}></BookOpenText>
-              <div class='panel-header-text'><strong>Text</strong></div>
+      <div id='fulltext' className="full-text-container" ref={mobileDivRef}>
+      <div className='panel-menu'>
+          <div className='panel-header'> 
+              <BookOpenText className="icon" size={18} />
+              <div className='panel-header-text'>Text</div>
           </div>
           {book && handleDisplayBook()}
       </div>
-        {fullText && handleFullText()}
+        {fullText ? handleFullText() : <EmptyText />}
       </div>
     );
   };
 
   const showResultsMobile = () => {
     return (
-    <div class="search-results-container">
-      <div class='panel-menu'>
-        <div class='panel-header'> 
-        <LibraryBig class="icon" size={25}></LibraryBig>
-            <div class='panel-header-text'><strong>Results</strong></div>
+    <div className="search-results-container">
+      <div className='panel-menu'>
+        <div className='panel-header'> 
+        <LibraryBig className="icon" size={18} />
+            <div className='panel-header-text'>Results</div>
         </div>
       </div>
-      {response && <p style={{ marginTop: '0px' }}>{handleResponse(response)}</p>}
+      {loading ? <div className="loading-container">Searching...</div> : response ? handleResponse(response) : <EmptyResults />}
       </div>
-    
     );
-
   };
 
   const mobileResultsButton = () => {
@@ -219,12 +230,12 @@ function App() {
 
   const handleMobileDisplay = () => {
     return (
-    <div class='mobile-container' ref={mobileDivRef}>
+    <div className='mobile-container' ref={mobileDivRef}>
       {toggleFullText ? showFullTextMobile() : showResultsMobile()}
-      <div class='mobile-toggle-bar'>
-      <LibraryBig class="button-icon icon" size={32} color='white' onClick={mobileResultsButton}></LibraryBig>
-      <BookOpenText class="button-icon icon" size={32} color='white' onClick={mobileTextButton}></BookOpenText>
-      <Search class="button-icon icon" size={32} color='white' onClick={handleSubmit}></Search>
+      <div className='mobile-toggle-bar'>
+      <LibraryBig className="button-icon" size={28} onClick={mobileResultsButton} />
+      <BookOpenText className="button-icon" size={28} onClick={mobileTextButton} />
+      <Search className="button-icon" size={28} onClick={handleSubmit} />
       </div>
     </div>
     );
@@ -266,26 +277,34 @@ function App() {
   
 
   return (
-    <div class='outer-container'>
-	  {/* SEARCH BAR */}
-    {InfoPopUp()}
-    
-      <div class='search-bar-container'>
-      <div class='search-filler'></div>
-      <form onSubmit={handleSubmit} class='search-form'>
-        <input
-          class="search-input"
-          type="text"
-          placeholder="Search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </form>
+    <div className='outer-container'>
+      {InfoPopUp()}
+
+      {/* HEADER */}
+      <div className='search-bar-container'>
+        <div className='app-title'>
+          <span className='app-title-star'>✦</span>
+          Seek Bahá'í
+        </div>
+        <form onSubmit={handleSubmit} className='search-form'>
+          <div className='search-input-wrapper'>
+            <Search className='search-icon' size={18} />
+            <input
+              className="search-input"
+              type="text"
+              placeholder="Search the writings..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+        </form>
+        <button className='info-button' onClick={() => setIsOpen(true)} type='button'>
+          <Info size={18} />
+        </button>
       </div>
-      <div class='search-filler'></div>
-	  
-	  {/* Search Results */}
-    {isMobile ? handleMobileDisplay() : SplitPanel()}
+
+      {/* CONTENT */}
+      {isMobile ? handleMobileDisplay() : SplitPanel()}
     </div>
   );
 }

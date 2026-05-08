@@ -59,12 +59,12 @@ function Quotation({ Similarity, Text, Sentence, Book, Section, index, fullTextC
 
 
   return (
-    <div onClick={handleShowSection} class='result'>
-      <div class='result-sentence-container'>
-          ...{Sentence} ...
+    <div onClick={handleShowSection} className='result'>
+      <div className='result-sentence-container'>
+          ...{Sentence}...
       </div>
-      <div class='result-book-container'>
-          <BookText class='icon'> </BookText> {Book}
+      <div className='result-book-container'>
+          <BookText className='icon' size={14} /> {Book}
       </div>
     </div>
   );

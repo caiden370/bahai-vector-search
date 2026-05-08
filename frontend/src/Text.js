@@ -10,7 +10,7 @@ const Text = ({ data, section_idx, highlightRef, handleBook }) => {
     }
     return (
 
-        <div class='full-text-main'>
+        <div className='full-text-main'>
             {Object.keys(data.Text).map((key) => {
                 const text = data.Text[key];
                 const section = data.Section[key];
@@ -28,7 +28,7 @@ const Text = ({ data, section_idx, highlightRef, handleBook }) => {
                         key={key}
                         style={isHeader ? { fontWeight: 'bold', marginLeft: 0 } : {marginLeft: 0}}
                         ref={isHighlight ? highlightRef : null}
-                        class={isHighlight ? 'highlight-text':''}
+                        className={isHighlight ? 'highlight-text':''}
                     >
                         {text}
                     </p>
