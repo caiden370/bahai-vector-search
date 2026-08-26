@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import Quotation from './quotation';
 import Text from './Text';
+import ConstellationMap from './constellation/ConstellationMap';
 import './App.css';
 import Split from "react-split";
-import { LibraryBig, BookOpenText, Search, Info, BookOpen, Sparkles } from 'lucide-react';
+import { LibraryBig, BookOpenText, Search, Info, BookOpen, Sparkles, Map } from 'lucide-react';
 import { useMediaQuery } from "react-responsive";
 import Modal from "react-modal";
 
@@ -12,6 +13,7 @@ import Modal from "react-modal";
 const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://bahai-vector-search.onrender.com';
 function App() {
   const [query, setQuery] = useState('');
+  const [submittedQuery, setSubmittedQuery] = useState('');
   const [response, setResponse] = useState('');
   const [book, setBook] = useState('');
   const [fullText, setFullText] = useState(null);
@@ -24,6 +26,12 @@ function App() {
   const [backToResult, setBackToResult] = useState(false);
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const [isOpen, setIsOpen] = useState(false);
+  // 'search' shows the results/reading panes, 'map' shows the constellation.
+  const [view, setView] = useState('search');
+  // The exact sentence that matched, highlighted inside its paragraph.
+  const [highlightedSentence, setHighlightedSentence] = useState(null);
+
+
 
   
 
@@ -64,6 +72,7 @@ function App() {
         }
       });
       setResponse(res.data.response);
+      setSubmittedQuery(query);
     } catch (error) {
       console.error("Error fetching data from the backend:", error);
     } finally {
@@ -72,13 +81,29 @@ function App() {
   };
 
 
-  const fullTextCallback = (arg, i) => {
+  const fullTextCallback = (arg, i, sentence) => {
     setFullText(arg);
     setSelectedIndex(i);
+    setHighlightedSentence(sentence || null);
     if (isMobile) {
       setToggleFullText(true);
     }
   }
+
+  // A star tapped on the map feeds the same reading pane a search result does,
+  // so the full surrounding context is one tap away.
+  const handleMapContext = (payload, sentence) => {
+    setFullText(payload);
+    setSelectedIndex(-1);
+    setHighlightedSentence(sentence || null);
+    handleScroll();
+  };
+
+  const openReaderFromMap = () => {
+    setView('search');
+    setToggleFullText(true);
+    handleScroll();
+  };
 
 
   const handleResponse = (response) => {
@@ -97,7 +122,7 @@ function App() {
   
   const handleFullText = () => {
 	return(
-		<Text data={fullText.response} section_idx={fullText.section_idx} highlightRef={highlightRef} handleBook={setBook}></Text>
+		<Text data={fullText.response} section_idx={fullText.section_idx} sentence={highlightedSentence} highlightRef={highlightRef} handleBook={setBook}></Text>
 	);
   };
 
@@ -174,6 +199,22 @@ function App() {
     );
   };
   // ----------------------------------------------------------------------------------------------
+  // CONSTELLATION MAP VIEW
+
+  const MapView = () => (
+    <div className='map-view-container'>
+      <ConstellationMap
+        url={REACT_APP_BACKEND_URL}
+        results={response || []}
+        query={submittedQuery}
+        isMobile={isMobile}
+        onContext={handleMapContext}
+        onOpenReader={openReaderFromMap}
+      />
+    </div>
+  );
+
+  // ----------------------------------------------------------------------------------------------
   // MOBILE VIEW
 
   const showFullTextMobile = () => {
@@ -209,11 +250,13 @@ function App() {
     if (mobileDivRef.current) {
       mobileDivRef.current.scrollTop = 0;
     }
-    
+
+    setView('search');
     setToggleFullText(false);
   }
 
   const mobileTextButton = () => {
+    setView('search');
     setToggleFullText(true);
     if (highlightRef.current) {
       // Add the highlight class
@@ -229,17 +272,22 @@ function App() {
   }
 
   const handleMobileDisplay = () => {
+    const onMap = view === 'map';
     return (
     <div className='mobile-container' ref={mobileDivRef}>
-      {toggleFullText ? showFullTextMobile() : showResultsMobile()}
+      {onMap ? MapView() : (toggleFullText ? showFullTextMobile() : showResultsMobile())}
       <div className='mobile-toggle-bar'>
-      <div className={`mobile-tab ${!toggleFullText ? 'mobile-tab-active' : ''}`} onClick={mobileResultsButton}>
+      <div className={`mobile-tab ${!onMap && !toggleFullText ? 'mobile-tab-active' : ''}`} onClick={mobileResultsButton}>
         <LibraryBig size={26} />
         <span>Results</span>
       </div>
-      <div className={`mobile-tab ${toggleFullText ? 'mobile-tab-active' : ''}`} onClick={mobileTextButton}>
+      <div className={`mobile-tab ${!onMap && toggleFullText ? 'mobile-tab-active' : ''}`} onClick={mobileTextButton}>
         <BookOpenText size={26} />
         <span>Text</span>
+      </div>
+      <div className={`mobile-tab ${onMap ? 'mobile-tab-active' : ''}`} onClick={() => setView('map')}>
+        <Map size={26} />
+        <span>Map</span>
       </div>
       </div>
     </div>
@@ -306,13 +354,33 @@ function App() {
             </button>
           </div>
         </form>
+        {!isMobile && (
+          <div className='view-tabs'>
+            <button
+              type='button'
+              className={`view-tab ${view === 'search' ? 'view-tab-active' : ''}`}
+              onClick={() => setView('search')}
+            >
+              <LibraryBig size={16} />
+              Search
+            </button>
+            <button
+              type='button'
+              className={`view-tab ${view === 'map' ? 'view-tab-active' : ''}`}
+              onClick={() => setView('map')}
+            >
+              <Map size={16} />
+              Map
+            </button>
+          </div>
+        )}
         <button className='info-button' onClick={() => setIsOpen(true)} type='button'>
           <Info size={18} />
         </button>
       </div>
 
       {/* CONTENT */}
-      {isMobile ? handleMobileDisplay() : SplitPanel()}
+      {isMobile ? handleMobileDisplay() : (view === 'map' ? MapView() : SplitPanel())}
     </div>
   );
 }

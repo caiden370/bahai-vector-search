@@ -40,11 +40,11 @@ function Quotation({ Similarity, Text, Sentence, Book, Section, index, fullTextC
         });
         const data = res.data;
         setNearbyTextResponse(data);
-        fullTextCallback(data, index);
+        fullTextCallback(data, index, Sentence);
 
       }
       else {
-        fullTextCallback(nearbyTextResponse);
+        fullTextCallback(nearbyTextResponse, index, Sentence);
       }
       
     } 

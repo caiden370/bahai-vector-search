@@ -142,6 +142,11 @@ def raw_query(model, query, centroids, n, cluster_dir, k):
             'Section':row['Section'],
             'Book':row['Book']
         }
+        # Position of this sentence on the precomputed constellation map. Written
+        # into the cluster CSVs by constellation_builder.py, so surfacing it
+        # costs the server nothing at query time.
+        if 'PointId' in row:
+            result['PointId'] = int(row['PointId'])
         texts.append(result)
     return texts
 

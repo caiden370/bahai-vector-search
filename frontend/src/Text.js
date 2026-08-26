@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import './App.css';
+import { highlightSentence } from './highlightSentence';
 
 
 
 
-const Text = ({ data, section_idx, highlightRef, handleBook }) => {
+const Text = ({ data, section_idx, sentence, highlightRef, handleBook }) => {
     if (!data) {
         return;
     }
@@ -30,7 +31,7 @@ const Text = ({ data, section_idx, highlightRef, handleBook }) => {
                         ref={isHighlight ? highlightRef : null}
                         className={isHighlight ? 'highlight-text':''}
                     >
-                        {text}
+                        {isHighlight ? highlightSentence(text, sentence) : text}
                     </p>
                 );
 
