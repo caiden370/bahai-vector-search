@@ -1,49 +1,47 @@
-# python embedding.py --model_name all-MiniLM-L6-v2 --cluster_dir sentencetransformer-embeddings
+# python vectordb_creator.py --model_name bge-small --database_dir sentence_database --out_dir vectordb_bge_small_100c --k 100
 import os
 import glob
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
-from sentence_transformers import SentenceTransformer
 import argparse
-from word2vec import BahaiWord2Vec
-from google_embedding import GoogleModel
+
+# Fragments left by splitting on "." after abbreviations ("Mrs.", "D.C.") or
+# before closing quotes; they match nothing useful and crowd out real results.
+MIN_WORDS = 4
+
+
+def load_sentences(database_dir):
+    csv_files = sorted(glob.glob(os.path.join(database_dir, '*.csv')))
+    data = pd.concat([pd.read_csv(file, index_col=0) for file in csv_files], ignore_index=True)
+    data = data[data['Sentence'].fillna('').str.split().str.len() >= MIN_WORDS]
+    data = data.drop_duplicates(subset=['Sentence', 'Book'])
+    return data.reset_index(drop=True)
+
+
+def encode_onnx(model, sentences, batch_size=64):
+    # Batch similar lengths together to keep padding small
+    order = np.argsort([len(s) for s in sentences])
+    embeddings = np.zeros((len(sentences), 384), dtype=np.float32)
+    for start in range(0, len(order), batch_size):
+        batch = order[start:start + batch_size]
+        embeddings[batch] = model.encode_batch([sentences[i] for i in batch])
+    return embeddings
+
 
 def create_database(model_name, database_dir, out_dir, k=10):
-    
+
     # Get the textual data
-    folder_path = database_dir
-    csv_files = glob.glob(os.path.join(folder_path, '*.csv'))
-    data_frames = []
-    for file in csv_files:
-        df = pd.read_csv(file, index_col=0)
-        data_frames.append(df)
-    data = pd.concat(data_frames, ignore_index=True)
-    sentences = data[data.columns[0]].tolist()
+    data = load_sentences(database_dir)
+    sentences = data['Sentence'].astype(str).tolist()
 
-    # Initialize the Sentence Transformer model
-    if model_name == 'word2vec':
-        model = BahaiWord2Vec()
-        model.load(model_file='word2vec_models/v3.model')  
-    elif model_name == 'all-MiniLM-L6-v2':
-        model = SentenceTransformer('all-MiniLM-L6-v2') 
-    elif model_name == 'simcse':
-        from simcse import SimCSE
-        model = SimCSE("princeton-nlp/sup-simcse-bert-base-uncased")
-    elif model_name == 'finetuned_bert':
-        model = SentenceTransformer("fine_tuned_model/")
-    elif model_name == 'finetune_bert_full':
-        model = SentenceTransformer("finetune_bert_full_dataset_1/")
-    elif model_name == 'google':
-        model = GoogleModel()
+    # Initialize the model and generate embeddings for each sentence
+    if model_name == 'bge-small':
+        from onnx_encoder import OnnxEncoder
+        embeddings = encode_onnx(OnnxEncoder('onnx_model'), sentences)
     else:
-        try:
-            model = SentenceTransformer(model_name)
-        except Exception as ex:
-            print(ex)
-
-    # Generate embeddings for each sentence
-    embeddings = model.encode(sentences)
+        from sentence_transformers import SentenceTransformer
+        embeddings = SentenceTransformer(model_name).encode(sentences)
 
     # Perform k-means clustering
     kmeans = KMeans(n_clusters=k, random_state=42)
@@ -72,3 +70,13 @@ def create_database(model_name, database_dir, out_dir, k=10):
     # Save centroid embeddings to a separate file
     centroids = kmeans.cluster_centers_
     np.save(f'{out_dir}/centroids_embeddings.npy', centroids)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Embed and cluster the sentence database.')
+    parser.add_argument('--model_name', type=str, default='bge-small')
+    parser.add_argument('--database_dir', type=str, default='sentence_database')
+    parser.add_argument('--out_dir', type=str, default='vectordb_bge_small_100c')
+    parser.add_argument('--k', type=int, default=100)
+    args = parser.parse_args()
+    create_database(args.model_name, args.database_dir, args.out_dir, args.k)

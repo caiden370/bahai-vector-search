@@ -8,7 +8,7 @@ import json
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-cluster_dir = 'vectordb_SBERT_sentence_100c'
+cluster_dir = 'vectordb_bge_small_100c'
 centroids = load_centroids(f"{cluster_dir}/centroids_embeddings.npy")
 model = OnnxEncoder("onnx_model")
 

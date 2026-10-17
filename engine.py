@@ -10,6 +10,8 @@ import json
 import heapq
 from functools import lru_cache
 
+from authors import author_for_file
+
 def load_centroids(centroids_path):
     return np.load(centroids_path)
 
@@ -109,14 +111,48 @@ def query(model, query, centroids, n, cluster_dir, k):
         print('-' * 80) 
 
 
-def raw_query(model, query, centroids, n, cluster_dir, k):
-    # print(centroids)
+@lru_cache(maxsize=1)
+def _book_files():
+    df = pd.read_csv('book_table.csv', index_col=0)
+    return dict(zip(df['book'], df['file']))
+
+
+def diversify(results, k, per_work, per_author):
+    """Pick k rows from similarity-ranked candidates, capping how many come
+    from one work (source file) and one author.
+
+    Without this the largest, most modern-English works (Promulgation of
+    Universal Peace, Paris Talks) fill most of the top results. Rows that the
+    caps skip are used to top up if there are not enough candidates.
+    """
+    book_files = _book_files()
+    seen, picked, skipped = set(), [], []
+    work_counts, author_counts = {}, {}
+    for idx, row in results.iterrows():
+        key = ' '.join(str(row['Sentence']).lower().split())
+        if key in seen:
+            continue
+        seen.add(key)
+        work = book_files.get(row['Book'], row['Book'])
+        author = author_for_file(work)
+        if work_counts.get(work, 0) >= per_work or author_counts.get(author, 0) >= per_author:
+            skipped.append(idx)
+            continue
+        work_counts[work] = work_counts.get(work, 0) + 1
+        author_counts[author] = author_counts.get(author, 0) + 1
+        picked.append(idx)
+        if len(picked) == k:
+            break
+    picked += skipped[:k - len(picked)]
+    return results.loc[picked].sort_values('Similarity', ascending=False)
+
+
+def raw_query(model, query, centroids, n, cluster_dir, k, pool=200, per_work=3, per_author=None):
     # Encode the query
-    query_embedding = np.array(model.encode(query))
+    query_embedding = np.array(model.encode_query(query))
 
     # Find the n closest centroids
     centroid_similarities = cosine_similarity([query_embedding], centroids)[0]
-    # centroid_similarities = torch.cosine_similarity(torch.tensor(query_embedding), torch.tensor(centroids), dim=1)[0]
     top_n_centroid_indices = np.argsort(centroid_similarities)[-n:][::-1]
 
     # Load embeddings and data for the selected clusters
@@ -126,12 +162,11 @@ def raw_query(model, query, centroids, n, cluster_dir, k):
         print("No embeddings found in the selected clusters.")
         return
 
-    # Find the k nearest neighbors in the selected clusters
-    top_k_indices, similarities = find_nearest_neighbors(query_embedding, embeddings, k)
-
-    # Retrieve and display the results
-    results = data.iloc[top_k_indices].copy()
-    results['Similarity'] = similarities  
+    # Rank a wider pool, then keep a varied top k from it
+    top_indices, similarities = find_nearest_neighbors(query_embedding, embeddings, pool)
+    candidates = data.iloc[top_indices].reset_index(drop=True)
+    candidates['Similarity'] = similarities
+    results = diversify(candidates, k, per_work, per_author or (k + 1) // 2)
 
     texts = []
     for idx, row in results.iterrows():
