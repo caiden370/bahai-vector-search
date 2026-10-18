@@ -12,6 +12,12 @@ cluster_dir = 'vectordb_bge_small_100c'
 centroids = load_centroids(f"{cluster_dir}/centroids_embeddings.npy")
 model = OnnxEncoder("onnx_model")
 
+@app.route('/ping', methods=['GET'])
+def handle_ping():
+    # Hit by the frontend on page load to wake the server from sleep
+    return '', 204
+
+
 @app.route('/query', methods=['GET'])
 def handle_query():
     q = request.args.get('query', '')  # Get the query from the request data

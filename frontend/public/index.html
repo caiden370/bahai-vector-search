@@ -2,6 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <script>
+      // Wake the backend (Render free tier sleeps when idle) as early as
+      // possible, before the app bundle has even downloaded.
+      (function () {
+        var url = '%REACT_APP_BACKEND_URL%';
+        if (!url || url.charAt(0) === '%') url = 'https://bahai-vector-search.onrender.com';
+        try { fetch(url + '/ping', { mode: 'no-cors', cache: 'no-store' }).catch(function () {}); } catch (e) {}
+      })();
+    </script>
     <link rel="icon" href="%PUBLIC_URL%/star.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
